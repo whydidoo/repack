@@ -3,6 +3,7 @@ import * as Repack from '@callstack/repack';
 import { NativeWindPlugin } from '@callstack/repack-plugin-nativewind';
 import { ReanimatedPlugin } from '@callstack/repack-plugin-reanimated';
 import TerserPlugin from 'terser-webpack-plugin';
+import webpack from 'webpack';
 
 const dirname = Repack.getDirname(import.meta.url);
 
@@ -112,6 +113,9 @@ export default Repack.defineWebpackConfig((env) => {
       ],
     },
     plugins: [
+      new webpack.DefinePlugin({
+        __REPACK_RSC_ENABLED__: JSON.stringify(false),
+      }),
       new Repack.RepackPlugin({
         output: {
           auxiliaryAssetsPath: path.join('build/output', platform, 'remote'),

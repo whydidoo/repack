@@ -17,6 +17,7 @@ Re.Pack is a toolkit for building and developing React Native applications with 
 - `packages/plugin-expo-modules/`: Re.Pack integration for Expo Modules.
 - `packages/plugin-nativewind/`: Re.Pack integration for NativeWind.
 - `packages/plugin-reanimated/`: Re.Pack integration for react-native-reanimated.
+- `packages/plugin-rsc/`: Experimental Rspack integration for React Server Components.
 
 ## Validation Surfaces
 

@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "paths": {},
+    "types": ["../repack/src/types/dev-server-options.d.ts"]
+  },
+  "exclude": ["**/__tests__/**"]
+}

@@ -1,0 +1,89 @@
+{
+  "name": "@callstack/repack-plugin-rsc",
+  "version": "5.2.5",
+  "description": "Experimental React Server Components integration for Re.Pack",
+  "author": "Callstack",
+  "license": "MIT",
+  "homepage": "https://github.com/callstack/repack",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/callstack/repack.git"
+  },
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "react-native": {
+    "./client": "./dist/rsc/client/index.js",
+    "./server": "./dist/rsc/server/index.js",
+    "./runtime": "./dist/rsc/runtime/index.js"
+  },
+  "files": ["dist", "react-native.config.js"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/rsc/client/index.d.ts",
+      "default": "./dist/rsc/client/index.js"
+    },
+    "./server": {
+      "types": "./dist/rsc/server/index.d.ts",
+      "default": "./dist/rsc/server/index.js"
+    },
+    "./runtime": {
+      "types": "./dist/rsc/runtime/index.d.ts",
+      "default": "./dist/rsc/runtime/index.js"
+    }
+  },
+  "keywords": [
+    "repack",
+    "re.pack",
+    "plugin",
+    "repack-plugin",
+    "react-native",
+    "react-server-components",
+    "rsc"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.29.0",
+    "@swc/helpers": "catalog:",
+    "estree-util-is-identifier-name": "^1.1.0",
+    "semver": "^7.7.2"
+  },
+  "peerDependencies": {
+    "@callstack/repack": "workspace:^",
+    "@rspack/core": ">=1",
+    "react": ">=19.2.3 <19.3.0",
+    "react-server-dom-webpack": ">=19.2.6 <19.3.0"
+  },
+  "devDependencies": {
+    "@callstack/repack": "workspace:*",
+    "@rspack/core": "catalog:",
+    "@types/jest": "^29.5.12",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:testers",
+    "@types/semver": "^7.7.0",
+    "babel-jest": "^29.7.0",
+    "jest": "^29.7.0",
+    "memfs": "^4.11.1",
+    "react": "catalog:",
+    "react-test-renderer": "catalog:",
+    "typescript": "catalog:"
+  },
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "pnpm run clean && tsc -p tsconfig.build.json",
+    "test": "jest",
+    "test:clean-install": "node ./scripts/test-clean-install.mjs",
+    "typecheck": "tsc --noEmit"
+  }
+}

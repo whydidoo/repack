@@ -148,7 +148,19 @@ describe('bundle command', () => {
           await bundleCommand.func([''], config, args);
 
           const files = await globby(['**/*'], { cwd: TMP_DIR, dot: true });
-          expect(files.sort()).toEqual(assets.sort());
+          const expectedAssets =
+            bundler === 'rspack'
+              ? [
+                  ...assets,
+                  `rsc/tester-app/7/${platform}/client.bundle`,
+                  `rsc/tester-app/7/${platform}/client.bundle.map`,
+                  `rsc/tester-app/7/${platform}/client.json`,
+                  `react-native-bundle-output/rsc/tester-app/7/${platform}/client.bundle`,
+                  `react-native-bundle-output/rsc/tester-app/7/${platform}/client.bundle.map`,
+                ]
+              : assets;
+
+          expect(files.sort()).toEqual(expectedAssets.sort());
         },
         60 * 1000
       );

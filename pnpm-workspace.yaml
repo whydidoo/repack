@@ -13,6 +13,11 @@ updateNotifier: false
 overrides:
   "caniuse-lite": ^1.0.30001774
 
+peerDependencyRules:
+  allowedVersions:
+    "react-dom@19.2.6>react": "19.2.3"
+    "react-server-dom-webpack@19.2.6>react": "19.2.3"
+
 allowBuilds:
   "@biomejs/biome": true
   "@swc/core": true
@@ -29,6 +34,7 @@ catalog:
   "webpack": ^5.104.1
   "react": "19.2.3"
   "react-native": "0.84.1"
+  "react-test-renderer": "19.2.3"
   "vitest": ^4.1.0
 
 catalogs:

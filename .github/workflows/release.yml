@@ -38,6 +38,9 @@ jobs:
       - name: Build packages
         run: pnpm build
 
+      - name: Check RSC package installation
+        run: pnpm --filter @callstack/repack-plugin-rsc test:clean-install
+
       - name: Check release files
         run: pnpm lint:ci
 
@@ -90,6 +93,9 @@ jobs:
 
       - name: Build canary packages
         run: pnpm build
+
+      - name: Check RSC package installation
+        run: pnpm --filter @callstack/repack-plugin-rsc test:clean-install
 
       - name: Check generated canary release files
         run: pnpm lint:ci

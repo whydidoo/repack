@@ -2,7 +2,9 @@ import path from 'node:path';
 import * as Repack from '@callstack/repack';
 import { NativeWindPlugin } from '@callstack/repack-plugin-nativewind';
 import { ReanimatedPlugin } from '@callstack/repack-plugin-reanimated';
+import { RscPlugin } from '@callstack/repack-plugin-rsc';
 import { RsdoctorRspackPlugin } from '@rsdoctor/rspack-plugin';
+import { rspack } from '@rspack/core';
 
 const dirname = Repack.getDirname(import.meta.url);
 
@@ -95,6 +97,12 @@ export default Repack.defineRspackConfig((env) => {
       ],
     },
     plugins: [
+      new rspack.DefinePlugin({
+        __REPACK_RSC_ENABLED__: JSON.stringify(true),
+        'process.env.REPACK_RSC_RELEASE': JSON.stringify(
+          process.env.REPACK_RSC_RELEASE ?? 'development'
+        ),
+      }),
       /**
        * Configure other required and additional plugins to make the bundle
        * work in React Native and provide good development experience with
@@ -105,10 +113,15 @@ export default Repack.defineRspackConfig((env) => {
        * from `Repack.plugins`.
        */
       new Repack.RepackPlugin({
+        platform,
         output: {
           auxiliaryAssetsPath: path.join('build/output', platform, 'remote'),
         },
         extraChunks: [
+          {
+            include: /^tester-app:client:/,
+            type: 'local',
+          },
           {
             include: /.+local.+/,
             type: 'local',
@@ -119,6 +132,15 @@ export default Repack.defineRspackConfig((env) => {
             outputPath: path.join('build/output', platform, 'remote'),
           },
         ],
+      }),
+      new RscPlugin({
+        name: 'tester-app',
+        runtimeVersion: process.env.REPACK_RSC_RUNTIME_VERSION ?? '7',
+        runtime: './src/rsc/rsc.runtime.ts',
+        server: {
+          roots: ['./src/rsc'],
+          setup: './src/rsc/rsc.server.ts',
+        },
       }),
       new ReanimatedPlugin({
         babelPluginOptions: { relativeSourceLocation: true },
