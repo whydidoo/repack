@@ -55,10 +55,19 @@
     "expo": ">=56"
   },
   "devDependencies": {
+    "@babel/core": "catalog:",
     "@callstack/repack": "workspace:*",
+    "@module-federation/enhanced": "catalog:expo57",
+    "@react-native/babel-preset": "catalog:testers",
     "@rspack/core": "catalog:",
     "@types/node": "catalog:",
-    "expo": "~57.0.9",
+    "babel-preset-expo": "catalog:expo57",
+    "expo": "catalog:expo57",
+    "expo-router": "catalog:expo57",
+    "react": "catalog:expo57",
+    "react-native": "catalog:",
+    "react-native-worklets": "catalog:expo57",
+    "source-map": "^0.7.4",
     "typescript": "catalog:"
   },
   "scripts": {

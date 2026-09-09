@@ -3,6 +3,7 @@
 import {
   type Diagnostic,
   parseExpoCommand,
+  runBuild,
   runDoctor,
   runInit,
 } from './commands.js';
@@ -20,7 +21,10 @@ function writeDiagnostics(diagnostics: Diagnostic[]): void {
 
 try {
   const options = parseExpoCommand(process.argv.slice(2));
-  if (options.command === 'init') {
+  if (options.command === 'build') {
+    const binary = runBuild(options);
+    process.stdout.write(`Release binary: ${binary}\n`);
+  } else if (options.command === 'init') {
     const result = runInit(options);
     if (options.json) {
       process.stdout.write(`${JSON.stringify(result)}\n`);

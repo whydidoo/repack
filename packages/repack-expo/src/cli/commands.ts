@@ -1,5 +1,7 @@
+import { type BuildOptions, parseBuildOptions } from './build.js';
 import type { CliOptions } from './types.js';
 
+export { runBuild } from './build.js';
 export { runDoctor } from './doctor.js';
 export { runInit } from './init.js';
 export { detectPackageManager } from './project.js';
@@ -14,18 +16,23 @@ export type {
   InitResult,
 } from './types.js';
 
-export const EXPO_COMMANDS = ['init', 'doctor'] as const;
+export const EXPO_COMMANDS = ['init', 'doctor', 'build'] as const;
 
 export type ExpoCommand = (typeof EXPO_COMMANDS)[number];
 
-export type ParsedExpoCommand = CliOptions & {
-  command: ExpoCommand;
-};
+export type ParsedExpoCommand =
+  | (CliOptions & {
+      command: 'init' | 'doctor';
+    })
+  | (BuildOptions & { command: 'build' });
 
 const USAGE = `Usage: repack-expo <${EXPO_COMMANDS.join('|')}> [--check] [--dry-run] [--json] [--force]`;
 
 export function parseExpoCommand(argv: string[]): ParsedExpoCommand {
   const [candidate, ...args] = argv;
+  if (candidate === 'build') {
+    return { command: 'build', ...parseBuildOptions(args) };
+  }
   if (!EXPO_COMMANDS.includes(candidate as ExpoCommand)) {
     throw new Error(USAGE);
   }
@@ -36,7 +43,7 @@ export function parseExpoCommand(argv: string[]): ParsedExpoCommand {
   }
   return {
     check: args.includes('--check'),
-    command: candidate as ExpoCommand,
+    command: candidate as 'init' | 'doctor',
     dryRun: args.includes('--dry-run'),
     force: args.includes('--force'),
     json: args.includes('--json'),

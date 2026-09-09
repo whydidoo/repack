@@ -197,12 +197,48 @@ After prebuild, standard native Release builds invoke Community CLI's `bundle`
 command. The registered Re.Pack commands dispatch that request to Rspack; no
 separate JavaScript export command is required.
 
-Typical local commands are:
+Expo CLI 57 performs an eager Metro export for `expo run:ios --configuration
+Release` and `expo run:android --variant release`, even with `--no-bundler`.
+Build with Xcode or Gradle directly instead. Once built, `expo run` with
+`--binary <path> --no-bundler` can install and launch the existing binary without
+that export step.
+
+Use the Re.Pack Expo CLI to build natively (Release is the default and currently
+the only configuration):
 
 ```sh
-npx expo run:ios --configuration Release --no-bundler
-npx expo run:android --variant release --no-bundler
+npx repack-expo build --platform android
+npx repack-expo build --platform ios
+# Also install and launch the built application:
+npx repack-expo build --platform android --run
+npx repack-expo build --platform ios --run --device <simulator-id>
 ```
+
+Run `npx expo prebuild --platform android` or `--platform ios` in the app
+directory first, and install iOS pods (`cd ios && pod install`) if needed. Build
+the workspace packages first when using this repository. The command never
+regenerates native projects automatically. Android currently supports macOS/Linux
+and the standard `app` module's Release APK (no custom flavors or APK splits).
+iOS requires macOS/Xcode and targets the simulator using the host architecture,
+not a signed device build or archive. It discovers the workspace and scheme;
+use `--scheme <name>` when the scheme is ambiguous. The output `.app` path is
+read from Xcode build settings rather than inferred from the scheme name.
+`--run` requires an Android device/emulator or an iOS simulator. `--device`
+selects the install target using Expo's device selector: an Android device/AVD
+name (not the `adb` serial), or an iOS simulator name/UDID. It requires `--run`.
+
+The repository host `tester-expo` exposes `repack:release:android` and `repack:release:ios`
+as aliases, for example `pnpm --filter tester-expo repack:release:ios --run`.
+The command does not start a dev server or build/serve
+Module Federation remotes; remote widgets still need their separate production
+build and HTTP server.
+
+`tester-expo-widget` does not provide standalone Release aliases. Its current
+configuration publishes nested lazy chunks as remote files, while standalone
+Release execution looks for those chunks inside the application and fails with
+`ChunkLoadError`. Standalone Release support is deferred; use
+`repack:build:production` to publish the widget and load it from `tester-expo`.
+The remote-in-host workflow has been validated on Android and iOS.
 
 Xcode and Gradle remain responsible for Hermes compilation, final source-map
 composition, native assets and application packaging. `expo export` is not a

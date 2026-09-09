@@ -1,6 +1,5 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const { createRequire } = require('node:module');
 const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
@@ -10,11 +9,10 @@ const {
 } = require('@callstack/repack');
 
 const { ExpoPlugin } = require('../dist/rspack/index.js');
-
-const requireFromDevServer = createRequire(
-  path.resolve(__dirname, '../../dev-server/package.json')
-);
-const { SourceMapConsumer } = requireFromDevServer('source-map');
+const {
+  installFixtureDependencies,
+} = require('./helpers/installFixtureDependencies.cjs');
+const { SourceMapConsumer } = require('source-map');
 
 function createProject() {
   const projectRoot = fs.realpathSync(
@@ -37,86 +35,14 @@ function createProject() {
     "module.exports = { presets: ['babel-preset-expo'] };"
   );
 
-  fs.mkdirSync(path.join(projectRoot, 'node_modules'));
-  for (const packageName of ['babel-preset-expo', 'expo']) {
-    fs.symlinkSync(
-      fs.realpathSync(
-        path.join(
-          __dirname,
-          '..',
-          '..',
-          '..',
-          'apps',
-          'tester-expo',
-          'node_modules',
-          packageName
-        )
-      ),
-      path.join(projectRoot, 'node_modules', packageName),
-      'junction'
-    );
-  }
-
-  const scopeRoot = path.join(
-    projectRoot,
-    'node_modules',
-    '@module-federation'
-  );
-  fs.mkdirSync(scopeRoot, { recursive: true });
-  fs.symlinkSync(
-    fs.realpathSync(
-      path.join(
-        __dirname,
-        '..',
-        '..',
-        'repack',
-        'node_modules',
-        '@module-federation',
-        'enhanced'
-      )
-    ),
-    path.join(scopeRoot, 'enhanced'),
-    'junction'
-  );
-  const reactNativeScopeRoot = path.join(
-    projectRoot,
-    'node_modules',
-    '@react-native'
-  );
-  fs.mkdirSync(reactNativeScopeRoot, { recursive: true });
-  fs.symlinkSync(
-    fs.realpathSync(
-      path.join(
-        __dirname,
-        '..',
-        '..',
-        '..',
-        'apps',
-        'tester-expo',
-        'node_modules',
-        '@react-native',
-        'babel-preset'
-      )
-    ),
-    path.join(reactNativeScopeRoot, 'babel-preset'),
-    'junction'
-  );
-  fs.symlinkSync(
-    fs.realpathSync(
-      path.join(
-        __dirname,
-        '..',
-        '..',
-        '..',
-        'apps',
-        'tester-expo',
-        'node_modules',
-        'react-native'
-      )
-    ),
-    path.join(projectRoot, 'node_modules', 'react-native'),
-    'junction'
-  );
+  installFixtureDependencies(projectRoot, [
+    '@module-federation/enhanced',
+    '@react-native/babel-preset',
+    'babel-preset-expo',
+    'expo',
+    'react',
+    'react-native',
+  ]);
 
   return projectRoot;
 }

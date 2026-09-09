@@ -5,6 +5,9 @@ const path = require('node:path');
 const test = require('node:test');
 const { rspack } = require('@rspack/core');
 const { ExpoPlugin } = require('../dist/rspack/index.js');
+const {
+  installFixtureDependencies,
+} = require('./helpers/installFixtureDependencies.cjs');
 
 class EmitAuxiliaryAssetPlugin {
   apply(compiler) {
@@ -52,11 +55,13 @@ function createProject() {
     fs.writeFileSync(path.join(projectRoot, filename), contents);
   }
 
-  fs.symlinkSync(
-    path.resolve(__dirname, '../../../apps/tester-expo/node_modules'),
-    path.join(projectRoot, 'node_modules'),
-    'junction'
-  );
+  installFixtureDependencies(projectRoot, [
+    '@react-native/babel-preset',
+    'babel-preset-expo',
+    'expo',
+    'react',
+    'react-native',
+  ]);
   return projectRoot;
 }
 

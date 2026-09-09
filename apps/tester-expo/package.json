@@ -8,6 +8,8 @@
     "repack:start": "react-native webpack-start",
     "repack:ios": "expo run:ios --no-bundler",
     "repack:android": "expo run:android --no-bundler",
+    "repack:release:android": "repack-expo build --platform android",
+    "repack:release:ios": "repack-expo build --platform ios",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

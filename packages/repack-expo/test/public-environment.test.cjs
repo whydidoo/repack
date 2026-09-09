@@ -16,6 +16,9 @@ const {
 } = require('../dist/rspack/environment/expoPublicEnvironment.js');
 const inlineExpoPublicEnvironment =
   require('../dist/rspack/babel/inlineExpoPublicEnvironment.js').default;
+const {
+  installFixtureDependencies,
+} = require('./helpers/installFixtureDependencies.cjs');
 
 function createEnvironmentProject(files) {
   const projectRoot = fs.realpathSync(
@@ -69,11 +72,13 @@ function createRspackEnvironmentProject(mode) {
       name: 'repack-expo-environment-test',
     }),
   });
-  const workspaceNodeModules = path.resolve(
-    __dirname,
-    '../../../apps/tester-expo/node_modules'
-  );
-  fs.symlinkSync(workspaceNodeModules, path.join(projectRoot, 'node_modules'));
+  installFixtureDependencies(projectRoot, [
+    '@react-native/babel-preset',
+    'babel-preset-expo',
+    'expo',
+    'react',
+    'react-native',
+  ]);
   return projectRoot;
 }
 

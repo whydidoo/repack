@@ -67,7 +67,7 @@ test('rejects unknown CLI commands without writing to the project', () => {
   );
 
   assert.equal(result.status, 1);
-  assert.match(result.stderr, /Usage: repack-expo <init\|doctor>/);
+  assert.match(result.stderr, /Usage: repack-expo <init\|doctor\|build>/);
   assert.deepEqual(fs.readdirSync(projectRoot), []);
 });
 

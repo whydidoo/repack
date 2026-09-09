@@ -14,6 +14,9 @@ const {
 } = require('../dist/rspack/loaders/withExpoBabelCaller.js');
 const expoRouterEntryLoader =
   require('../dist/rspack/loaders/expoRouterEntryLoader.js').default;
+const {
+  installFixtureDependencies,
+} = require('./helpers/installFixtureDependencies.cjs');
 
 function getExpoBabelLoaderOptions(
   loaderOptions,
@@ -164,27 +167,7 @@ function createProject({
 }
 
 function installModuleFederationEnhanced(projectRoot) {
-  const scopeRoot = path.join(
-    projectRoot,
-    'node_modules',
-    '@module-federation'
-  );
-  fs.mkdirSync(scopeRoot, { recursive: true });
-  fs.symlinkSync(
-    fs.realpathSync(
-      path.join(
-        __dirname,
-        '..',
-        '..',
-        'repack',
-        'node_modules',
-        '@module-federation',
-        'enhanced'
-      )
-    ),
-    path.join(scopeRoot, 'enhanced'),
-    'junction'
-  );
+  installFixtureDependencies(projectRoot, ['@module-federation/enhanced']);
 }
 
 function mockInternalRepackPlugin(plugin, observe = () => {}) {
@@ -716,6 +699,64 @@ test('replaces the standard Router entry with a Metro-free bootstrap loader', ()
   assert.match(source, /qualified-entry\.js/);
   assert.match(source, /renderRootComponent\.js/);
   assert.doesNotMatch(source, /@expo\/metro-runtime/);
+});
+
+test('replaces an absolute symlinked Router entry with the bootstrap loader', () => {
+  const projectRoot = createProject({ main: 'expo-router/entry' });
+  const routerRoot = path.join(projectRoot, 'node_modules', 'expo-router');
+  const physicalRouterRoot = path.join(
+    fs.mkdtempSync(path.join(os.tmpdir(), 'repack-expo-router-')),
+    'expo-router'
+  );
+  fs.renameSync(routerRoot, physicalRouterRoot);
+  fs.symlinkSync(physicalRouterRoot, routerRoot, 'junction');
+  const entryPath = fs.realpathSync(path.join(routerRoot, 'entry.js'));
+
+  for (const platform of ['ios', 'android']) {
+    const plugin = createUnitExpoPlugin({ entry: entryPath });
+    const compiler = createCompiler({
+      mode: 'production',
+      platform,
+      plugins: [plugin],
+      projectRoot,
+    });
+
+    plugin.apply(compiler);
+
+    const routerRule = compiler.options.module.rules.find(
+      (rule) =>
+        rule.enforce === 'pre' &&
+        rule.test instanceof RegExp &&
+        rule.test.test(entryPath)
+    );
+    assert.ok(
+      routerRule,
+      'absolute Router entry should install the bootstrap loader'
+    );
+    assert.match(routerRule.use.loader, /expoRouterEntryLoader\.js$/);
+  }
+});
+
+test('does not replace a custom entry when Expo Router is installed', () => {
+  const projectRoot = createProject({ main: 'expo-router/entry' });
+  const entryPath = path.join(projectRoot, 'custom-entry.js');
+  fs.writeFileSync(entryPath, 'module.exports = {};');
+  const plugin = createUnitExpoPlugin({ entry: entryPath });
+  const compiler = createCompiler({
+    mode: 'production',
+    plugins: [plugin],
+    projectRoot,
+  });
+
+  plugin.apply(compiler);
+
+  const routerRule = compiler.options.module.rules.find(
+    (rule) =>
+      rule.enforce === 'pre' &&
+      rule.test instanceof RegExp &&
+      rule.test.test(fs.realpathSync(entryPath))
+  );
+  assert.equal(routerRule, undefined);
 });
 
 test('rejects a separately configured RepackPlugin in either plugin order', () => {
