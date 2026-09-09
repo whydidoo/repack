@@ -204,23 +204,6 @@ function packageMetadata(): {
   }
 }
 
-function normalizePublishRange(
-  name: string,
-  range: string
-): string | undefined {
-  if (!range.startsWith('workspace:')) return range;
-  try {
-    const sibling = readJson(
-      path.resolve(__dirname, `../../../${name.split('/').at(-1)}/package.json`)
-    );
-    const version = sibling.version;
-    if (typeof version !== 'string') return undefined;
-    return range === 'workspace:^' ? `^${version}` : version;
-  } catch {
-    return undefined;
-  }
-}
-
 export function dependencyRanges(): Record<string, string> {
   const metadata = packageMetadata();
   const ranges: Record<string, string> = {};
@@ -228,8 +211,7 @@ export function dependencyRanges(): Record<string, string> {
   for (const name of ['@callstack/repack', '@rspack/core']) {
     const range = metadata.peerDependencies?.[name];
     if (range) {
-      const normalized = normalizePublishRange(name, range);
-      if (normalized) ranges[name] = normalized;
+      ranges[name] = range;
     }
   }
   return ranges;
