@@ -10,7 +10,6 @@ const packageJson = require('../package.json');
 
 test('keeps the integration package private during development', () => {
   assert.equal(packageJson.name, '@callstack/repack-expo');
-  assert.equal(packageJson.version, '0.0.0');
   assert.equal(packageJson.private, true);
 });
 
@@ -37,7 +36,7 @@ test('loads the default CommonJS Config Plugin and registers native mods once', 
   assert.deepEqual(Object.keys(configured.mods).sort(), ['android', 'ios']);
   assert.equal(
     configured._internal.pluginHistory['@callstack/repack-expo'].version,
-    '0.0.0'
+    packageJson.version
   );
   assert.equal(withRepackExpo(configured), configured);
 });

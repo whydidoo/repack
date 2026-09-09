@@ -7,6 +7,8 @@ import {
 } from './config/options.js';
 import { validateExpoConfig } from './config/validateExpoConfig.js';
 
+const { version } = require('../package.json') as { version: string };
+
 const withRepackExpo: ConfigPlugin<RepackExpoPluginOptions | void> = (
   config,
   options
@@ -19,4 +21,4 @@ const withRepackExpo: ConfigPlugin<RepackExpoPluginOptions | void> = (
   );
 };
 
-export = createRunOncePlugin(withRepackExpo, '@callstack/repack-expo', '0.0.0');
+export = createRunOncePlugin(withRepackExpo, '@callstack/repack-expo', version);

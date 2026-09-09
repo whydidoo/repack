@@ -9,7 +9,7 @@ import type {
 } from './types.js';
 
 export const CONFIG_PLUGIN = '@callstack/repack-expo';
-export const RSPACK_COMMANDS = '@callstack/repack/commands/rspack';
+export const RSPACK_COMMANDS = '@callstack/repack/commands';
 export const RSPACK_CONFIG_NAMES = [
   'rspack.config.mts',
   'rspack.config.cts',
