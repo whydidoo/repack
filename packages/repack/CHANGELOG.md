@@ -1,5 +1,31 @@
 # @callstack/repack
 
+## 5.4.0
+
+### Minor Changes
+
+- [#1430](https://github.com/callstack/repack/pull/1430) [`33df89a`](https://github.com/callstack/repack/commit/33df89a735314be29cc8bc6f8e23f8d139164aa8) Thanks [@jbroma](https://github.com/jbroma)! - Bring the Rspack development experience in line with Webpack by compiling each
+  platform only when its bundle is first requested. Multi-platform development
+  servers no longer eagerly build unused platforms, so launching an iOS app does
+  not wait for Android to compile, and vice versa.
+
+- [#1424](https://github.com/callstack/repack/pull/1424) [`8dcc116`](https://github.com/callstack/repack/commit/8dcc116c291fe7fb7eb9f0f6c9640058e83a9c50) Thanks [@jbroma](https://github.com/jbroma)! - Add the unified `@callstack/repack/commands` entry point with automatic bundler detection and a `--bundler` override. Re.Pack Init now uses it, while bundler-specific entry points remain available with deprecation warnings.
+
+### Patch Changes
+
+- [#1456](https://github.com/callstack/repack/pull/1456) [`e283ccf`](https://github.com/callstack/repack/commit/e283ccfe76113b632454684de2ae0933bc11f133) Thanks [@ilteoood](https://github.com/ilteoood)! - Fix `BabelPlugin` to set the `babel-loader` entry of `resolveLoader.fallback` as an array containing the resolved path, instead of a plain string. Rspack's resolver and downstream tools that consume the resolved loader config (e.g. `RSDoctor`) expect the value to be an array; a bare string triggered `Given napi value is not an array on NapiResolveOptions.fallback`. This still matches Rspack's `ResolveAlias` (`{ [x: string]: string | false | (string | false)[] }`) and Webpack's resolver loader fallback shape.
+
+- [#1434](https://github.com/callstack/repack/pull/1434) [`ed1003f`](https://github.com/callstack/repack/commit/ed1003fe1eec193001724ad239b279f543438b13) Thanks [@MikitasK](https://github.com/MikitasK)! - Fix development symbolication for Module Federation host and remote bundles. The host now follows a remote bundle's declared source map, invalid generated webpack source URLs no longer invalidate an otherwise usable map, symbolication continues when an individual frame cannot be mapped, and code frames use the matching source map's embedded source content. The dev server also logs the first useful symbolicated runtime frame as a fallback when opening the source file from the device is delayed.
+
+- [#1449](https://github.com/callstack/repack/pull/1449) [`09e7375`](https://github.com/callstack/repack/commit/09e7375e9b2a07afffb0417edd01a21007dd74e5) Thanks [@yunsung-miso](https://github.com/yunsung-miso)! - Keep the original error message for iOS script download failures instead of surfacing "Unknown error from a native module".
+
+- [#1454](https://github.com/callstack/repack/pull/1454) [`b440b44`](https://github.com/callstack/repack/commit/b440b44dd89c7a6be098527559c2e2e46c0957d8) Thanks [@giaBaoJS](https://github.com/giaBaoJS)! - Read the `react-native` config from the array form of `shared` in `ModuleFederationPlugin`, so the generated `react-native/` and `@react-native/` deep imports inherit its `eager`, `import` and `version` values instead of falling back to the defaults.
+
+- [#1424](https://github.com/callstack/repack/pull/1424) [`8dcc116`](https://github.com/callstack/repack/commit/8dcc116c291fe7fb7eb9f0f6c9640058e83a9c50) Thanks [@jbroma](https://github.com/jbroma)! - Reject pending webpack asset requests when compilation fails instead of leaving requests hanging.
+
+- Updated dependencies [[`ed1003f`](https://github.com/callstack/repack/commit/ed1003fe1eec193001724ad239b279f543438b13)]:
+  - @callstack/repack-dev-server@5.4.0
+
 ## 5.3.0
 
 ### Minor Changes
