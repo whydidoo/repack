@@ -1,32 +1,11 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getJsTransformRules, RepackPlugin } from '@callstack/repack';
-import type { RuleSetRule, RuleSetUseItem } from '@rspack/core';
+import type { RuleSetRule } from '@rspack/core';
 import { describe, expect, inject, it } from 'vitest';
-import { createCompiler } from '../helpers.js';
+import { collectSwcLoaderOptions, createCompiler } from '../helpers.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-type SwcOptions = {
-  jsc?: { transform?: { react?: { development?: boolean } } };
-};
-
-function collectSwcOptions(rules: unknown[]): SwcOptions[] {
-  return rules.flatMap((rule) => {
-    if (!rule || typeof rule !== 'object') return [];
-    const { use, loader, options, oneOf, rules: nested } = rule as RuleSetRule;
-    const uses = [use].flat().filter(Boolean) as RuleSetUseItem[];
-    return [
-      ...(loader === 'builtin:swc-loader' ? [options as SwcOptions] : []),
-      ...uses
-        .filter((item) => typeof item === 'object')
-        .filter((item) => item.loader === 'builtin:swc-loader')
-        .map((item) => (item as { options: SwcOptions }).options),
-      ...collectSwcOptions(oneOf ?? []),
-      ...collectSwcOptions(nested ?? []),
-    ];
-  });
-}
 
 async function getJsxDevelopmentFlags(
   mode: 'development' | 'production',
@@ -41,7 +20,7 @@ async function getJsxDevelopmentFlags(
     plugins: [new RepackPlugin({ platform: 'ios' })],
   });
 
-  return collectSwcOptions(compiler.options.module.rules).map(
+  return collectSwcLoaderOptions(compiler.options.module.rules).map(
     (options) => options.jsc?.transform?.react?.development
   );
 }
